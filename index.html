@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Polymer's Curve</title>
+
+		<meta name="description" content="First impressions with Polymer, building a web app">
+		<meta name="author" content="Jason Pierce">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css" id="theme">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1>Polymer</h1>
+					<h3>The Next Learning Curve</h3>
+					<p>
+						<small>Presentation by <a href="http://sponhumanprod.com/events">Jason Pierce</a> / <a href="http://twitter.com/DistractionBoy_">@DistractionBoy_</a></small>
+					</p>
+				</section>
+				<section>
+					<h2>Last Time...</h2>
+					<ol>
+						<li>
+							Grunt vs Gulp
+						</li>
+						<li>
+							Configuration vs Programming
+						</li>
+					</ol>
+				</section>
+
+				<section>
+					<h2>What is Polymer?</h2>
+					<p style="text-align:left;">
+						A tool that puts together a number of upcoming web standards to quickly produce web apps
+					</p>
+					<p style="text-align:left;">
+						How does it do this? Polyfills - downloadable code which provides facilities that are not built into a web browser. It implements technology that a developer expects the browser to provide natively, providing a more uniform API landscape. For example, many features of HTML5 are not supported by versions of Internet Explorer older than version 8 or 9, but can be used by web pages if those pages install a polyfill.
+					</p>
+						Keep this in the back of your head.
+				</section>
+
+				<section>
+					<section>
+						<h2>The "import" Statement</h2>
+						<p style="text-align:left;">
+							How do we currently load other files into the current markup we're looking at?
+							<ul>
+								<li>
+									For CSS on an HTML page...
+									<pre><code data-trim contenteditable>
+											<link rel="stylesheet" href="main.css" />
+											...
+									</code></pre>
+								</li>
+								<li>
+									<pre><code data-trim contenteditable>
+<style>
+    @import url('main.css');
+    @import url('fonts.css');
+</style>
+...
+									</code></pre>
+								</li>
+							</ul>
+						</p>
+					</section>
+					<section>
+						<h2>Difference Between the Two</h2>
+						<p style="text-align:left;">
+							Using "link" statements always allow for concurrent downloading and then parsing, whereas "@import" can cause <a href="http://www.stevesouders.com/blog/2009/04/09/dont-use-import/">funny things</a> to happen.
+						</p>
+						<p style="text-align:left;">
+							You might say, "But we use '@import' in our SCSS files all the time with no performance issues or 'funny things' happening".
+						</p>
+						<p style="text-align:left;">
+							We use Compass or another compiler which loads the @import'ed stylesheets, and parses all of them at once and spits them out into one minified css file, and <br><strong>YAAAAAAY! No performance or compile issues!!!!!!</strong>
+						</p>
+					</section>
+					<section>
+						<h2>How Do We Attach Javascript?</h2>
+						<p style="text-align:left;">
+							In a similar fashion, we add javascript/jquery to an HTML page with either...
+							<ul>
+								<li>
+									For JS files on an HTML page...
+									<pre><code data-trim contenteditable>
+											<script type="text/javascript" src="app.js"></script>
+											...
+									</code></pre>
+								</li>
+								<li>
+									For Loading JS inline (HTML5)...
+									<pre><code data-trim contenteditable>
+<script>
+  var navbar = document.getElementById('navbar');
+  if (window.innerWidth <= 767){
+    navbar.someMethod();
+  }
+</script>
+									</code></pre>
+								</li>
+							</ul>
+						</p>
+					</section>
+					<section>
+						<h2>How Do We Load Outside HTML Into the Current DOM?</h2>
+						<ol>
+							<li>AJAX</li>
+							<li>iframe</li>
+							<li>CrazyHacks™ - embedded in strings, hidden as comments (e.g. < script type="text/html" >). Yuck!</li>
+						</ol>
+						<br>
+						<br>
+						<p>
+							<blockquote>
+								The web's most basic content, HTML, requires the greatest amount of effort to work with. - <a href="http://www.html5rocks.com/en/tutorials/webcomponents/imports/">Eric Bidelman</a>
+							</blockquote>
+						</p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Introducing the HTML 'import'</h2>
+						<br>
+						<p style="text-align:left;">In the < head > section ...</p>
+						<pre><code data-trim contenteditable>
+	<link rel="import" href="/path/to/imports/stuff.html">
+						</code></pre>
+						<br>
+
+						<p style="text-align:left;">
+							The URL of an import is called an <strong>import location</strong>. To load content from another domain, the import location needs to be CORS-enabled:
+						</p>
+						<pre><code data-trim contenteditable>
+<!-- Resources on other origins must be CORS-enabled. -->
+<link rel="import" href="http://example.com/elements.html">
+						</code></pre>
+					</section>
+					<section>
+						<h2>Web Components</h2>
+						<p style="text-align:left;">
+							The import statement allows us to make and use Web Components, which are custom elements, or encapsulated bits of HTML, CSS and Javascript. They make use of:
+							<ul>
+								<li>The Shadow DOM</li>
+								<li>< template > statements</li>
+								<li>Encapsulation and re-use</li>
+							</ul>
+						</p>
+						<p style="text-align:left;">
+							Note: The browser's network stack automatically de-dupes all requests from the same URL. This means that imports that reference the same URL are only retrieved once. No matter how many times an import at the same location is loaded, it only executes once. - Eric Bidelman
+						</p>
+					</section>
+					<section>
+						<h2>Structure of a Web Component</h2>
+
+						<h5>A Code Demo Showing:</h5>
+
+						<ul>
+							<li>imports</li>
+							<li>CSS</li>
+							<li>< template ></li>
+							<li>JS</li>
+						</ul>
+					</section>
+					<section>
+						<h2>Local Server</h2>
+						<p style="text-align:left;">
+							To get the import statement to work, you need:
+							<ol>
+								<li>A polyfill for the import statement (Polymer Provides)</li>
+								<li>A server to process the request</li>
+							</ol>
+						</p>
+						<p style="text-align:left;">
+							Cross-Origin Resource Sharing (CORS) is a W3C spec that allows cross-domain communication from the browser. By building on top of the XMLHttpRequest object, CORS allows developers to work with the same idioms as same-domain requests.
+						</p>
+						<p>
+							<a href="http://www.html5rocks.com/en/tutorials/cors/">More...</a>
+						</p>
+					</section>
+					<section>
+						<h2>Local Server continued</h2>
+						<p style="text-align:left;">
+							Polymer's <a href="https://www.polymer-project.org/docs/start/usingelements.html">website</a> says that if you are working within a local project, and do not import resources from another domain (www.resourcehere.com) you <strong>do not need</strong> a local server running.
+						</p>
+						<p style="text-align:left;">
+							However, this was not the case for me. Using Gulp, even with a liveReload local server running, I was not able to successfully use import'ed html resources, even though they were within my own project files.
+						</p>
+					</section>
+					<section>
+						<h2>No Gulp Scaffolding Yet</h2>
+						<p style="text-align:left;">
+							When it was tried to import Polymer into an existing project with typical Gulp settings using the instructions on Polymer's website, none of the Polymer styles or behaviors would work.
+						</p>
+						<p style="text-align:left;">
+							Upon further investigation, the Polymer website said that it was working on a build tool/setup for Gulp, and that it had one for grunt already.
+						</p>
+						<p>
+							<a href="https://github.com/yeoman/generator-polymer">A generator that works</a><br />
+							<a href="https://www.polymer-project.org/docs/start/getting-the-code.html">polymer</a>
+						</p>
+					</section>
+					<section>
+						<h2>Back to Grunt</h2>
+
+						<p style="text-align:left;">
+							After switching back to Grunt, and <strong>carefully</strong> reading the documentation for using core-elements, I was able to scaffold my app and tweak the given web components to my needs.
+						</p>
+
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>A Sample Scaffolding</h2>
+						<h5>Things to note</h5>
+						<ol>
+							<li>Everything contained within core-drawer-panel</li>
+							<li>< body > tag has "fullbleed", "layout", and "vertical" attributes</li>
+							<li>Each element has its own attributes and caviats - <br><strong>PAY ATTENTION TO DOCUMENTATION </strong></li>
+							<li>FlexBox at the core of <a href="https://www.polymer-project.org/docs/polymer/layout-attrs.html">layout</a></li>
+						</ol>
+					</section>
+					<section>
+						<h2>Flexbox</h2>
+
+						<div style="position:relative;"><img style="max-width:40%;float:left;" src="sampleBox1.jpg" alt=""><img style="max-width:40%;float:left;margin-left:18%;" src="sampleBox2.jpg" alt=""></div>
+					</section>
+					<section>
+						<h2>Basics and Terminology</h2>
+						<img src="flexbox.png" alt="">
+						<p>
+							main axis : main-start | main-end : main size : cross axis : cross-start | cross-end : cross size
+						</p>
+						<h5><a href="http://css-tricks.com/snippets/css/a-guide-to-flexbox/">Complete Guide</a></h5>
+					</section>
+					<section>
+						<h2>Flexbox in Polymer's Layout</h2>
+						<p style="text-align:left;">
+							Containing element has either "horizontal" or "vertical" attribute, plus the word "layout". If it's the < body > element, you can also add "fullbleed".
+						</p>
+						<p style="text-align:left;">
+							Child elements typically have more attributes, because they can be both child and parent elements to another child element. Using "flex" will make a child element stretch to fill space across the main axis. Using number amounts will define the ratio to the length of the other child elements (e.g. "flex two" will be twice as big as "flex" and "flex six" will be three times as big as "flex two")
+						</p>
+						<p><a href="https://www.polymer-project.org/docs/polymer/layout-attrs.html">Polymer's guide</a></p>
+					</section>
+					<section>
+						<h2>Flexbox Child Attributes (cont'd)</h2>
+						<p style="text-align:left;">
+							Align across the main-axis with "start-justified", "center-justified", and "end-justified". Align across the cross-axis with "self-start", "self-center", "self-end", and self-stretch.
+						</p>
+						<p style="text-align:left;">
+							Auto-vertical, an attribute that is supposed to adjust horizontal layouts into vertical ones when narrow media queries are triggered, <strong>DOES NOT WORK.</strong>
+						</p>
+						<!-- show them 3/5 ratio if haven't already -->
+					</section>
+					<section>
+						<h2>Rigid Scaffolding Elements</h2>
+						<ul>
+							<li>core-header-panel</li>
+							<li>core-toolbar</li>
+							<li>core-drawer-panel</li>
+							<li>core-scaffold</li>
+							<li>...others</li>
+						</ul>
+						<p style="text-align:left;">
+							Some fit within each other and play nicely together, and some do not. Trial and error is the only way to find out which is which. <a href="https://www.polymer-project.org/docs/elements/layout-elements.html">Quick Guide</a>
+						</p>
+						<p style="text-align:left;">
+							For a more comprehensive look into customizing these elements, you need to look up each element individually.
+						</p>
+					</section>
+					<section>
+						<h2>core-scroll-header-panel</h2>
+
+						<p style="text-align:left;">
+							Through much trial and error, and looking at the code of examples, I finally got it to do what I wanted to do by adding "main condenses keepcondensedheader headerHeight="263" condensedHeaderHeight="64" flex" as attributes, and adding a style to the core-toolbar's shadow element #mainheader negating the default background color.
+						</p>
+						<p style="text-align:left;">
+							Javascript was added to add/remove elements on different screen widths
+						</p>
+						<p style="text-align:left;">
+							All contained within core-drawer-panel, including the content.
+						</p>
+					</section>
+					<section>
+						<h2>Styling for Shadow DOM</h2>
+						<pre><code data-trim contenteditable>
+<!-- inside a web component... -->
+:host {
+  display: block;
+  position: relative;
+}
+
+<!-- overwriting from the outside -->
+core-scroll-header-panel::shadow #headerBg {
+  background-image: url('header-bg.jpg');
+}
+core-scroll-header-panel::shadow #condensedHeaderBg {
+  background-color: $emerald-green;
+}
+						</code></pre>
+						<p style="text-align:left;">
+							CSS styles defined in Shadow DOM are confined to Shadow Root, meaning any ID tags inside the Shadow Root will not conflict with those on the outside.
+						</p>
+					</section>
+					<section>
+						<h2>Some New CSS</h2>
+						<pre><code data-trim contenteditable>
+:host([mode=scroll]) #mainContainer {
+  overflow: visible;
+}
+:host([mode=scroll]) #outerContainer {
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+						</code></pre>
+						<p style="text-align:left;">
+							More info about shadowDom styling: <a href="http://www.html5rocks.com/en/tutorials/webcomponents/shadowdom-201/">By Eric Bidelman</a>
+						</p>
+					</section>
+				</section>
+
+
+				<section>
+					<section>
+						<h2>Wrapping It Up, B</h2>
+
+						<ol>
+							<li>HTML import statement
+								<ul>
+									<li> CORS request</li>
+								</ul></li>
+							<li>Switch back to Grunt (for now)</li>
+							<li>Building a Web Component
+								<ul>
+									<li> < template ></li>
+								</ul></li>
+							<li>Using existing Web Components</li>
+							<li>Scaffolding a Polymer app 
+								<ul>
+									<li> Core elements</li>
+									<li> Using Documentation</li>
+									<li> Flexbox Attributes</li>
+								</ul></li>
+							<li>Styling for Shadow DOM</li>
+						</ol>
+					</section>
+					<section>
+						<h2>Next Time</h2>
+						<ol>
+							<li>Custom built elements</li>
+							<li>Content (copy) in all pages</li>
+							<li>The < app-router > component <a href="http://customelements.io/">and more</a></li>
+							<li>Material Design</li>
+							<li>Fixes to existing problems</li>
+						</ol>
+					</section>
+				</section>
+
+				<section style="text-align: left;">
+					<h1>THE END</h1>
+					<!-- pre-write closing statement (index card) -->
+				</section>
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
